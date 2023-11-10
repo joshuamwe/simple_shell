@@ -19,10 +19,9 @@
 #define BUF_FLUSH -1
 char *get_location(char *command);
 int main(void);
-void execmd(char **argv);
 ssize_t readLine(char **lineptr, size_t *n);
 char *copyString(const char *source);
 int countTokens(const char *str, const char *delim);
 char **tokenizeString(const char *str, const char *delim, int num_tokens);
-void executeCommand(char **argv);
+void execmd(char **argv);
 #endif

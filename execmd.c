@@ -1,19 +1,11 @@
 #include "main.h"
 /**
  * execmd - main function
- * @argv: parameter
+ * @argv: argument
  * Return: void
  */
 void execmd(char **argv)
 {
-	char *command = NULL;
-
-	if (argv)
-	{
-		command = argv[0];
-		if (execve(command, argv, NULL) == -1)
-		{
-			perror("Error:");
-		};
-	}
+	printf("Executing command...\n");
 }
+

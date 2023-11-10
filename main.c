@@ -7,7 +7,6 @@ ssize_t readLine(char **lineptr, size_t *n);
 char *copyString(const char *source);
 int countTokens(const char *str, const char *delim);
 
-void executeCommand(char **argv);
 /**
  * readLine - Reads a line from stdin.
  * @lineptr: Pointer to the buffer
@@ -90,17 +89,6 @@ char **tokenizeString(const char *str, const char *delim, int num_tokens)
 	return (tokens);
 }
 
-
-/**
- * execmd - Executes a command with arguments.
- * @argv: Array of command arguments.
-*/
-void execmd(char **argv);
-{
-	printf("Executing command...\n");
-}
-
-
 /**
  * main - main function
  * @ac: parameter 1
@@ -129,7 +117,7 @@ int main(void)
 		}
 		lineptr_copy = copyString(lineptr);
 
-		executeCommand(tokenized);
+		execmd(tokenized);
 
 
 		free(lineptr_copy);
