@@ -18,7 +18,7 @@
 #define WRITE_BUF_SIZE 1024
 #define BUF_FLUSH -1
 char *get_location(char *command);
-int main(int ac, char **argv);
+int main(void);
 void execmd(char **argv);
 ssize_t readLine(char **lineptr, size_t *n);
 char *copyString(const char *source);

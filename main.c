@@ -107,7 +107,7 @@ void execmd(char **argv);
  * @argv: para 2
  * Return: 0
  */
-int main(int ac, char **argv)
+int main(void)
 {
 	ssize_t nochars_read;
 	size_t n = 0;
@@ -116,7 +116,6 @@ int main(int ac, char **argv)
 	const char *delim = " \n";
 	int num_tokens = countTokens(lineptr, delim);
         char **tokenized = tokenizeString(lineptr_copy, delim, num_tokens);
-	void(ac);
 
 	for (;;)
 	{
