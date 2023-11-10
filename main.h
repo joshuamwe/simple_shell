@@ -10,18 +10,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#define CMD_NORM	0
-#define CMD_OR		1
-#define CMD_AND		2
-#define CMD_CHAIN	3
-#define READ_BUF_SIZE 1024
-#define WRITE_BUF_SIZE 1024
-#define BUF_FLUSH -1
 char *get_location(char *command);
 int main(void);
 ssize_t readLine(char **lineptr, size_t *n);
 char *copyString(const char *source);
 int countTokens(const char *str, const char *delim);
-char **tokenizeString(const char *str, const char *delim, int num_tokens);
+char **tokenizeString(const char *str, const char *delim, int *num_tokens);
 void execmd(char **argv);
 #endif

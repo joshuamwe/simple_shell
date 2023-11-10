@@ -8,8 +8,9 @@ char *strdup_checked(const char *str);
 char *build_file_path(const char *directory, const char *command);
 int file_exists(const char *file_path, struct stat *buffer);
 char *search_in_path(const char *path_copy, const char *command);
+
 /**
- *strdup_checked -  Duplicate a string and check for errors
+ * strdup_checked - Duplicate a string and check for errors
  * @str: parameter
  * Return: duplicate
  */
@@ -41,11 +42,11 @@ char *build_file_path(const char *directory, const char *command)
 	if (!file_path)
 	{
 		perror("malloc");
-
 		return (NULL);
 	}
 
 	strcpy(file_path, directory);
+
 	strcat(file_path, "/");
 	strcat(file_path, command);
 
@@ -64,7 +65,7 @@ int file_exists(const char *file_path, struct stat *buffer)
 }
 
 /**
- * search_in_path -Search location of a command in PATH
+ * search_in_path - Search location of a command in PATH
  * @path_copy: paramet 1
  * @command: para 2
  * Return: NULL
@@ -73,6 +74,7 @@ char *search_in_path(const char *path_copy, const char *command)
 {
 	char *path_token = strtok(strdup_checked(path_copy), ":");
 	char *file_path;
+	char *result = NULL;
 
 	while (path_token != NULL)
 	{
@@ -85,7 +87,10 @@ char *search_in_path(const char *path_copy, const char *command)
 
 		if (file_exists(file_path, NULL))
 		{
-			return (file_path);
+			result = strdup_checked(file_path);
+			free(file_path);
+
+			return (result);
 		}
 		else
 		{
@@ -93,8 +98,10 @@ char *search_in_path(const char *path_copy, const char *command)
 		}
 		path_token = strtok(NULL, ":");
 	}
+
 	return (NULL);
 }
+
 /**
  * get_location - main function
  * @command: parameter 1
@@ -113,7 +120,6 @@ char *get_location(char *command)
 		{
 			return (NULL);
 		}
-
 		free(path_copy);
 
 		if (result)
@@ -125,7 +131,6 @@ char *get_location(char *command)
 			return (strdup_checked(command));
 		}
 	}
-
 	return (NULL);
 }
 

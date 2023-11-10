@@ -1,8 +1,9 @@
+#include "main.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "main.h"
-char **tokenizeString(const char *str, const char *delim, int num_tokens);
+
+char **tokenizeString(const char *str, const char *delim, int *num_tokens);
 ssize_t readLine(char **lineptr, size_t *n);
 char *copyString(const char *source);
 int countTokens(const char *str, const char *delim);
@@ -13,7 +14,6 @@ int countTokens(const char *str, const char *delim);
  * @n: Size of the buffer.
  * Return: ssize_t Number of characters read.
  */
-
 ssize_t readLine(char **lineptr, size_t *n)
 {
 	ssize_t nochars_read = getline(lineptr, n, stdin);
@@ -35,6 +35,7 @@ char *copyString(const char *source)
 		perror("memo alloc error");
 		exit(EXIT_FAILURE);
 	}
+
 	strcpy(copy, source);
 	return (copy);
 }
@@ -57,6 +58,7 @@ int countTokens(const char *str, const char *delim)
 		token = strtok(NULL, delim);
 	}
 	free(strCopy);
+
 	return (num_tokens);
 }
 
@@ -64,22 +66,28 @@ int countTokens(const char *str, const char *delim)
  * tokenizeString - Tokenizes a string and stores tokens
  * @str: String to be tokenized.
  * @delim: Delimiter used for tokenization.
- * @num_tokens: tokens Number of tokens in the string.
+ * @num_tokens: Pointer to the variable to store the number of tokens.
  * Return: char** Array of tokens.
  */
-char **tokenizeString(const char *str, const char *delim, int num_tokens)
+char **tokenizeString(const char *str, const char *delim, int *num_tokens)
 {
-	char **tokens = malloc(sizeof(char *) * num_tokens);
-	int i;
-	char *token = strtok(copyString(str), delim);
+	char **tokens;
+	int i = 0;
+	char *token;
+
+	*num_tokens = countTokens(str, delim);
+
+	tokens = malloc(sizeof(char *) * (*num_tokens + 1));
 
 	if (tokens == NULL)
 	{
 		perror("memo alloc error");
 		exit(EXIT_FAILURE);
 	}
+	token = strtok(copyString(str), delim);
 
 	while (token != NULL)
+
 	{
 		tokens[i] = copyString(token);
 		i++;
@@ -91,8 +99,6 @@ char **tokenizeString(const char *str, const char *delim, int num_tokens)
 
 /**
  * main - main function
- * @ac: parameter 1
- * @argv: para 2
  * Return: 0
  */
 int main(void)
@@ -102,8 +108,9 @@ int main(void)
 	char *prompt = "shell";
 	char *lineptr = NULL, *lineptr_copy = NULL;
 	const char *delim = " \n";
-	int num_tokens = countTokens(lineptr, delim);
-        char **tokenized = tokenizeString(lineptr_copy, delim, num_tokens);
+	int num_tokens;
+	char **tokenized;
+	int i;
 
 	for (;;)
 	{
@@ -115,13 +122,17 @@ int main(void)
 			printf("shell exit...\n");
 			return (-1);
 		}
+
 		lineptr_copy = copyString(lineptr);
 
-		execmd(tokenized);
-
+		tokenized = tokenizeString(lineptr_copy, delim, &num_tokens);
 
 		free(lineptr_copy);
 
+		for (i = 0; i < num_tokens; i++)
+		{
+			free(tokenized[i]);
+		}
 		free(tokenized);
 	}
 	free(lineptr);
