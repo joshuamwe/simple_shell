@@ -17,4 +17,5 @@ char *copyString(const char *source);
 int countTokens(const char *str, const char *delim);
 char **tokenizeString(const char *str, const char *delim, int *num_tokens);
 void execmd(char **argv);
+int MaiN(void);
 #endif
