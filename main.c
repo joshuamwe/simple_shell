@@ -116,7 +116,7 @@ int main(int ac, char **argv)
 	const char *delim = " \n";
 	int num_tokens = countTokens(lineptr, delim);
         char **tokenized = tokenizeString(lineptr_copy, delim, num_tokens);
-	(void)ac;
+	void(ac);
 
 	for (;;)
 	{
