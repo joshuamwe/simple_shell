@@ -9,7 +9,7 @@ char *build_file_path(const char *directory, const char *command);
 int file_exists(const char *file_path, struct stat *buffer);
 char *search_in_path(const char *path_copy, const char *command);
 /**
- * Duplicate a string and check for errors
+ *strdup_checked -  Duplicate a string and check for errors
  * @str: parameter
  * Return: duplicate
  */
@@ -71,9 +71,10 @@ int file_exists(const char *file_path, struct stat *buffer)
  */
 char *search_in_path(const char *path_copy, const char *command)
 {
-	char *path_token;
+	char *path_token = strtok(strdup_checked(path_copy), ":");
 	char *file_path;
-	for (path_token = strtok(strdup_checked(path_copy), ":"); path_token != NULL; path_token = strtok(NULL, ":"))
+
+	while (path_token != NULL)
 	{
 		file_path = build_file_path(path_token, command);
 
@@ -90,37 +91,41 @@ char *search_in_path(const char *path_copy, const char *command)
 		{
 			free(file_path);
 		}
+		path_token = strtok(NULL, ":");
 	}
 	return (NULL);
 }
-
 /**
- * Main function to get the location of a command
+ * get_location - main function
+ * @command: parameter 1
+ * Return: NULL
  */
-char *get_location(char *command) {
-    char *path = getenv("PATH");
+char *get_location(char *command)
+{
+	char *path = getenv("PATH");
+	char *path_copy = strdup_checked(path);
+	char *result = search_in_path(path_copy, command);
+	struct stat buffer;
 
-    if (path) {
-        char *path_copy = strdup_checked(path);
+	if (path)
+	{
+		if (!path_copy)
+		{
+			return (NULL);
+		}
 
-        if (!path_copy) {
-            return NULL;
-        }
+		free(path_copy);
 
-        char *result = search_in_path(path_copy, command);
+		if (result)
+		{
+			return (result);
+		}
+		if (file_exists(command, &buffer))
+		{
+			return (strdup_checked(command));
+		}
+	}
 
-        free(path_copy);
-
-        if (result) {
-            return result;
-        }
-        struct stat buffer;
-
-        if (file_exists(command, &buffer)) {
-            return strdup_checked(command);
-        }
-    }
-
-    return NULL;
+	return (NULL);
 }
 
