@@ -1,8 +1,5 @@
 #include "main.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
+
 
 char **tokenizeString(const char *str, const char *delim, int *num_tokens);
 ssize_t readLine(char **lineptr, size_t *n);
@@ -152,22 +149,6 @@ void execute_command(char **argv)
 	}
 }
 /**
- *freeTokens - main
- * @tokens: oara 1
- * @num_tokens: para2
- * Return: void
- */
-void freeTokens(char **tokens, int num_tokens)
-{
-	int i;
-
-	for (i = 0; i < num_tokens; i++)
-	{
-		free(tokens[i]);
-	}
-	free(tokens);
-}
-/**
  * main - main function
  * Return: 0
  */
@@ -219,4 +200,20 @@ int main(void)
 		freeTokens(tokenized, num_tokens);
 	}
 	return (0);
+}
+/**
+ *freeTokens - main
+ * @tokens: oara 1
+ * @num_tokens: para2
+ * Return: void
+ */
+void freeTokens(char **tokens, int num_tokens)
+{
+	int i;
+
+	for (i = 0; i < num_tokens; i++)
+	{
+		free(tokens[i]);
+	}
+	free(tokens);
 }
