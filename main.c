@@ -1,13 +1,15 @@
 #include "main.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 
 char **tokenizeString(const char *str, const char *delim, int *num_tokens);
 ssize_t readLine(char **lineptr, size_t *n);
 char *copyString(const char *source);
 int countTokens(const char *str, const char *delim);
-
+void env_builtin(void);
+void execute_command(char **argv);
 /**
  * readLine - Reads a line from stdin.
  * @lineptr: Pointer to the buffer
@@ -98,6 +100,46 @@ char **tokenizeString(const char *str, const char *delim, int *num_tokens)
 }
 
 /**
+ * env_builtin - Implements the 'env' built-in command.
+ * Return: void
+ */
+void env_builtin(void)
+{
+	char **env;
+
+	for (env = environ; *env != NULL; env++)
+	{
+		printf("%s\n", *env);
+	}
+}
+/**
+ * execute_command - Executes external commands.
+ * @argv: Array of command and arguments.
+ * Return: void
+ */
+void execute_command(char **argv)
+{
+	pid_t pid = fork();
+
+	if (pid == -1)
+	{
+		perror("fork");
+		exit(EXIT_FAILURE);
+	}
+	else if (pid == 0)
+	{
+		if (execvp(argv[0], argv) == -1)
+		{
+			perror("execvp");
+			exit(EXIT_FAILURE);
+		}
+	}
+	else
+	{
+		wait(NULL);
+	}
+}
+/**
  * main - main function
  * Return: 0
  */
@@ -122,12 +164,23 @@ int main(void)
 			printf("shell exit...\n");
 			return (-1);
 		}
-
 		lineptr_copy = copyString(lineptr);
 
 		tokenized = tokenizeString(lineptr_copy, delim, &num_tokens);
 
 		free(lineptr_copy);
+
+		if (num_tokens > 0 && strcmp(tokenized[0], "env") == 0)
+		{
+			env_builtin();
+		}
+		else
+		{
+			if (num_tokens > 0)
+			{
+				execute_command(tokenized);
+			}
+		}
 
 		for (i = 0; i < num_tokens; i++)
 		{
@@ -136,6 +189,6 @@ int main(void)
 		free(tokenized);
 	}
 	free(lineptr);
+
 	return (0);
 }
-
