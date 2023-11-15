@@ -190,7 +190,7 @@ int main(void)
 		{
 			printf("shell exit...\n");
 			free(lineptr);
-			return (-1);
+			exit(EXIT_SUCCESS);
 		}
 		lineptr_copy = copyString(lineptr);
 
@@ -198,26 +198,25 @@ int main(void)
 
 		free(lineptr_copy);
 
-		if (num_tokens > 0 && strcmp(tokenized[0], "env") == 0)
+		if (num_tokens > 0)
 		{
-			env_builtin();
-		}
-		else if (num_tokens > 0 && strcmp(tokenized[0], "exit") == 0)
-		{
-			freeTokens(tokenized, num_tokens);
-			free(lineptr);
-			exit(EXIT_SUCCESS);
-		}
-		else
-		{
-			if (num_tokens > 0)
+			if (strcmp(tokenized[0], "exit") == 0)
+			{
+				freeTokens(tokenized, num_tokens);
+				free(lineptr);
+				printf("Shell exit...\n");
+				exit(EXIT_SUCCESS);
+			}
+			else if (strcmp(tokenized[0], "env") == 0)
+			{
+				env_builtin();
+			}
+			else
 			{
 				execute_command(tokenized);
 			}
 		}
 		freeTokens(tokenized, num_tokens);
 	}
-	free(lineptr);
-
 	return (0);
 }
