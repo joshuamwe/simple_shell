@@ -18,6 +18,19 @@ ssize_t readLine(char **lineptr, size_t *n)
 {
 	ssize_t nochars_read = getline(lineptr, n, stdin);
 
+	if (nochars_read == -1)
+	{
+		if (feof(stdin))
+		{
+			printf("\n");
+			exit(EXIT_SUCCESS);
+		}
+		else
+		{
+			perror("readLine error");
+			exit(EXIT_FAILURE);
+		}
+	}
 	return (nochars_read);
 }
 
@@ -29,7 +42,7 @@ ssize_t readLine(char **lineptr, size_t *n)
 char *copyString(const char *source)
 {
 	char *copy = malloc(strlen(source) + 1);
-	
+
 	if (copy == NULL)
 	{
 		perror("memo alloc error");
@@ -75,25 +88,38 @@ char **tokenizeString(const char *str, const char *delim, int *num_tokens)
 	int i = 0;
 	char *token;
 
-	*num_tokens = countTokens(str, delim);
+	*num_tokens = 0;
 
-	tokens = malloc(sizeof(char *) * (*num_tokens + 1));
+	tokens = malloc(sizeof(char *));
 
 	if (tokens == NULL)
 	{
 		perror("memo alloc error");
 		exit(EXIT_FAILURE);
 	}
+
 	token = strtok(copyString(str), delim);
 
 	while (token != NULL)
-
 	{
+		(*num_tokens)++;
+
+		tokens = realloc(tokens, sizeof(char *) * (*num_tokens));
+
+		if (tokens == NULL)
+		{
+			perror("memo alloc error");
+			exit(EXIT_FAILURE);
+		}
+
 		tokens[i] = copyString(token);
 		i++;
 		token = strtok(NULL, delim);
 	}
-	tokens[i] = NULL;
+
+	free(tokens[(*num_tokens) - 1]);
+	tokens[i - 1] = NULL;
+
 	return (tokens);
 }
 
