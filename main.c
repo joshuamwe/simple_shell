@@ -2,7 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <unistd.h>
+int executeCommand(char **tokens);
 char **tokenizeString(const char *str, const char *delim, int *num_tokens);
 ssize_t readLine(char **lineptr, size_t *n);
 char *copyString(const char *source);
@@ -121,6 +122,36 @@ char **tokenizeString(const char *str, const char *delim, int *num_tokens)
 	tokens[i - 1] = NULL;
 
 	return (tokens);
+}
+
+/**
+ * executeCommand - Executes the command
+ * @tokens: Array of arguments.
+ * Return: int Exit status of the command.
+ */
+int executeCommand(char **tokens)
+{
+	pid_t pid;
+	int status;
+
+	pid = fork();
+	if (pid == 0)
+	{
+		if (execvp(tokens[0], tokens) == -1)
+		{
+			perror("executeCommand error");
+		}
+		exit(EXIT_FAILURE);
+	}
+	else if (pid < 0)
+	{
+		perror("fork error");
+	}
+	else
+	{
+		waitpid(pid, &status, 0);
+	}
+	return (1);
 }
 
 /**
