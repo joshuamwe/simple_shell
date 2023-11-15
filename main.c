@@ -8,6 +8,7 @@ char **tokenizeString(const char *str, const char *delim, int *num_tokens);
 ssize_t readLine(char **lineptr, size_t *n);
 char *copyString(const char *source);
 int countTokens(const char *str, const char *delim);
+void printEnvironment(void);
 
 /**
  * readLine - Reads a line from stdin.
@@ -153,7 +154,20 @@ int executeCommand(char **tokens)
 	}
 	return (1);
 }
+/**
+ * printEnvironment - Prints the current environment.
+ */
+void printEnvironment(void)
+{
+	extern char **environ;
+	char **env = environ;
 
+	while (*env != NULL)
+	{
+		printf("%s\n", *env);
+		env++;
+	}
+}
 /**
  * main - main function
  * Return: 0
