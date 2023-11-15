@@ -131,6 +131,7 @@ char *get_location(char *command)
 			return (strdup_checked(command));
 		}
 	}
+	free(result);
 	return (NULL);
 }
 

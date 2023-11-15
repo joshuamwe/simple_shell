@@ -10,6 +10,7 @@ char *copyString(const char *source);
 int countTokens(const char *str, const char *delim);
 void env_builtin(void);
 void execute_command(char **argv);
+void freeTokens(char **tokens, int num_tokens);
 /**
  * readLine - Reads a line from stdin.
  * @lineptr: Pointer to the buffer
@@ -140,6 +141,22 @@ void execute_command(char **argv)
 	}
 }
 /**
+ *freeTokens - main
+ * @tokens: oara 1
+ * @num_tokens: para2
+ * Return: void
+ */
+void freeTokens(char **tokens, int num_tokens)
+{
+	int i;
+
+	for (i = 0; i < num_tokens; i++)
+	{
+		free(tokens[i]);
+	}
+	free(tokens);
+}
+/**
  * main - main function
  * Return: 0
  */
@@ -152,7 +169,6 @@ int main(void)
 	const char *delim = " \n";
 	int num_tokens;
 	char **tokenized;
-	int i;
 
 	for (;;)
 	{
@@ -162,6 +178,7 @@ int main(void)
 		if (nochars_read == -1)
 		{
 			printf("shell exit...\n");
+			free(lineptr);
 			return (-1);
 		}
 		lineptr_copy = copyString(lineptr);
@@ -174,6 +191,12 @@ int main(void)
 		{
 			env_builtin();
 		}
+		else if (num_tokens > 0 && strcmp(tokenized[0], "exit") == 0)
+		{
+			freeTokens(tokenized, num_tokens);
+			free(lineptr);
+			exit(EXIT_SUCCESS);
+		}
 		else
 		{
 			if (num_tokens > 0)
@@ -181,12 +204,7 @@ int main(void)
 				execute_command(tokenized);
 			}
 		}
-
-		for (i = 0; i < num_tokens; i++)
-		{
-			free(tokenized[i]);
-		}
-		free(tokenized);
+		freeTokens(tokenized, num_tokens);
 	}
 	free(lineptr);
 
