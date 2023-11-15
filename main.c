@@ -122,16 +122,27 @@ void execute_command(char **argv)
 {
 	pid_t pid = fork();
 
+	char *command_path = get_location(argv[0]);
+
 	if (pid == -1)
 	{
 		perror("fork");
 		exit(EXIT_FAILURE);
 	}
+
 	else if (pid == 0)
 	{
-		if (execvp(argv[0], argv) == -1)
+		if (command_path != NULL)
 		{
-			perror("execvp");
+			if (execv(command_path, argv) == -1)
+			{
+				perror("execv");
+				exit(EXIT_FAILURE);
+			}
+		}
+		else
+		{
+			fprintf(stderr, "Command not found: %s\n", argv[0]);
 			exit(EXIT_FAILURE);
 		}
 	}
