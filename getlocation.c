@@ -22,7 +22,6 @@ char *strdup_checked(const char *str)
 	{
 		perror("strdup");
 	}
-
 	return (duplicate);
 }
 
@@ -36,7 +35,6 @@ char *build_file_path(const char *directory, const char *command)
 {
 	int directory_length = strlen(directory);
 	int command_length = strlen(command);
-
 	char *file_path = malloc(directory_length + command_length + 2);
 
 	if (!file_path)
@@ -44,10 +42,10 @@ char *build_file_path(const char *directory, const char *command)
 		perror("malloc");
 		return (NULL);
 	}
-
 	strcpy(file_path, directory);
 
 	strcat(file_path, "/");
+
 	strcat(file_path, command);
 
 	return (file_path);
@@ -79,7 +77,6 @@ char *search_in_path(const char *path_copy, const char *command)
 	while (path_token != NULL)
 	{
 		file_path = build_file_path(path_token, command);
-
 		if (!file_path)
 		{
 			return (NULL);
@@ -98,7 +95,6 @@ char *search_in_path(const char *path_copy, const char *command)
 		}
 		path_token = strtok(NULL, ":");
 	}
-
 	return (NULL);
 }
 
@@ -126,6 +122,7 @@ char *get_location(char *command)
 		{
 			return (result);
 		}
+
 		if (file_exists(command, &buffer))
 		{
 			return (strdup_checked(command));
