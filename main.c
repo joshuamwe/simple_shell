@@ -133,33 +133,98 @@ char **tokenizeString(const char *str, const char *delim, int *num_tokens)
 int executeCommand(char **tokens)
 {
 	pid_t pid;
+	char *path = getenv("PATH");
+	char *path_copy = copyString(path);
+	char *dir = strtok(path_copy, ":");
+	int found = 0;
 	int status;
+	char *full_path = malloc(strlen(dir) + strlen(tokens[0]) + 2);
 
 	pid = fork();
-	if (pid == 0)
+	found = 1;
+
+	pid = fork();
+
+	if (tokens[0] == NULL)
 	{
-		if (execvp(tokens[0], tokens) == -1)
-		{
-			perror("executeCommand error");
-		}
-		exit(EXIT_FAILURE);
+		return (1);
 	}
-	else if (pid < 0)
+
+	if (access(tokens[0], X_OK) == 0)
 	{
-		perror("fork error");
+		if (pid == 0)
+		{
+			if (execvp(tokens[0], tokens) == -1)
+			{
+				perror("executeCommand error");
+			}
+			exit(EXIT_FAILURE);
+		}
+		else if (pid < 0)
+		{
+			perror("fork error");
+		}
+		else
+		{
+			waitpid(pid, &status, 0);
+		}
 	}
 	else
 	{
-		waitpid(pid, &status, 0);
+		if (path == NULL)
+		{
+			fprintf(stderr, "PATH not set\n");
+			return (1);
+		}
+
+		while (dir != NULL)
+		{
+			if (full_path == NULL)
+			{
+				perror("memo alloc error");
+				exit(EXIT_FAILURE);
+			}
+
+			sprintf(full_path, "%s/%s", dir, tokens[0]);
+
+			if (access(full_path, X_OK) == 0)
+			{
+				if (pid == 0)
+				{
+					if (execv(full_path, tokens) == -1)
+					{
+						perror("executeCommand error");
+					}
+					exit(EXIT_FAILURE);
+				}
+				else if (pid < 0)
+				{
+					perror("fork error");
+				}
+				else
+				{
+					waitpid(pid, &status, 0);
+				}
+			}
+			free(full_path);
+			dir = strtok(NULL, ":");
+		}
+		free(path_copy);
+
+		if (!found)
+		{
+			fprintf(stderr, "%s: command not found\n", tokens[0]);
+		}
 	}
+
 	return (1);
 }
+
 /**
  * printEnvironment - Prints the current environment.
  */
 void printEnvironment(void)
 {
-	extern char **environ;
 	char **env = environ;
 
 	while (*env != NULL)
@@ -168,6 +233,7 @@ void printEnvironment(void)
 		env++;
 	}
 }
+
 /**
  * main - main function
  * Return: 0
@@ -185,19 +251,17 @@ int main(void)
 
 	for (;;)
 	{
-		nochars_read = readLine(&lineptr, &n);
 		printf("%s", prompt);
+		nochars_read = readLine(&lineptr, &n);
 
 		if (nochars_read == -1)
 		{
 			printf("shell exit...\n");
 			break;
 		}
-
 		lineptr_copy = copyString(lineptr);
 
 		tokenized = tokenizeString(lineptr_copy, delim, &num_tokens);
-
 		free(lineptr_copy);
 		if (num_tokens > 0 && strcmp(tokenized[0], "exit") == 0)
 		{
@@ -205,6 +269,28 @@ int main(void)
 			break;
 		}
 
+		else if (num_tokens > 0 && strcmp(tokenized[0], "cd") == 0)
+		{
+			if (num_tokens > 1)
+			{
+				if (chdir(tokenized[1]) != 0)
+				{
+					perror("cd error");
+				}
+			}
+			else
+			{
+				fprintf(stderr, "cd: missing argument\n");
+			}
+		}
+		else if (num_tokens > 0 && strcmp(tokenized[0], "env") == 0)
+		{
+			printEnvironment();
+		}
+		else
+		{
+			executeCommand(tokenized);
+		}
 		for (i = 0; i < num_tokens; i++)
 		{
 			free(tokenized[i]);
@@ -214,4 +300,5 @@ int main(void)
 	free(lineptr);
 	return (0);
 }
+
 
