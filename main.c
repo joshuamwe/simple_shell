@@ -29,7 +29,7 @@ ssize_t readLine(char **lineptr, size_t *n)
 char *copyString(const char *source)
 {
 	char *copy = malloc(strlen(source) + 1);
-
+	
 	if (copy == NULL)
 	{
 		perror("memo alloc error");
@@ -120,7 +120,7 @@ int main(void)
 		if (nochars_read == -1)
 		{
 			printf("shell exit...\n");
-			return (-1);
+			break;
 		}
 
 		lineptr_copy = copyString(lineptr);
@@ -128,6 +128,11 @@ int main(void)
 		tokenized = tokenizeString(lineptr_copy, delim, &num_tokens);
 
 		free(lineptr_copy);
+		if (num_tokens > 0 && strcmp(tokenized[0], "exit") == 0)
+		{
+			printf("Exiting shell...\n");
+			break;
+		}
 
 		for (i = 0; i < num_tokens; i++)
 		{
