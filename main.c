@@ -156,27 +156,26 @@ int main(void)
 {
 	ssize_t nochars_read;
 	size_t n = 0;
-	char *prompt = "shell";
+	char *prompt = "simple_shell> ";
 	char *lineptr = NULL, *lineptr_copy = NULL;
 	const char *delim = " \n";
 	int num_tokens;
 	char **tokenized;
 
-	for (;;)
+	while (1)
 	{
-		nochars_read = readLine(&lineptr, &n);
 		printf("%s", prompt);
+		nochars_read = readLine(&lineptr, &n);
 
 		if (nochars_read == -1)
 		{
-			printf("shell exit...\n");
+			printf("\nShell exit...\n");
 			free(lineptr);
 			exit(EXIT_SUCCESS);
 		}
 		lineptr_copy = copyString(lineptr);
 
 		tokenized = tokenizeString(lineptr_copy, delim, &num_tokens);
-
 		free(lineptr_copy);
 
 		if (num_tokens > 0)
