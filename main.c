@@ -6,7 +6,6 @@ ssize_t readLine(char **lineptr, size_t *n);
 char *copyString(const char *source);
 int countTokens(const char *str, const char *delim);
 void env_builtin(void);
-void execute_command(char **argv);
 void freeTokens(char **tokens, int num_tokens);
 /**
  * readLine - Reads a line from stdin.
@@ -16,11 +15,16 @@ void freeTokens(char **tokens, int num_tokens);
  */
 ssize_t readLine(char **lineptr, size_t *n)
 {
-	ssize_t nochars_read = getline(lineptr, n, stdin);
+    ssize_t nochars_read = getline(lineptr, n, stdin);
 
-	return (nochars_read);
+    if (nochars_read == -1)
+    {
+        perror("getline error");
+        exit(EXIT_FAILURE);
+    }
+
+    return nochars_read;
 }
-
 /**
  * copyString - Allocates memory
  * @source: String to be copied.
@@ -28,16 +32,16 @@ ssize_t readLine(char **lineptr, size_t *n)
  */
 char *copyString(const char *source)
 {
-	char *copy = malloc(strlen(source) + 1);
+    char *copy = malloc(strlen(source) + 1);
 
-	if (copy == NULL)
-	{
-		perror("memo alloc error");
-		exit(EXIT_FAILURE);
-	}
+    if (copy == NULL)
+    {
+        perror("malloc error");
+        exit(EXIT_FAILURE);
+    }
 
-	strcpy(copy, source);
-	return (copy);
+    strcpy(copy, source);
+    return copy;
 }
 
 /**
@@ -108,44 +112,6 @@ void env_builtin(void)
 	for (env = environ; *env != NULL; env++)
 	{
 		printf("%s\n", *env);
-	}
-}
-/**
- * execute_command - Executes external commands.
- * @argv: Array of command and arguments.
- * Return: void
- */
-void execute_command(char **argv)
-{
-	pid_t pid = fork();
-
-	char *command_path = get_location(argv[0]);
-
-	if (pid == -1)
-	{
-		perror("fork");
-		exit(EXIT_FAILURE);
-	}
-
-	else if (pid == 0)
-	{
-		if (command_path != NULL)
-		{
-			if (execv(command_path, argv) == -1)
-			{
-				perror("execv");
-				exit(EXIT_FAILURE);
-			}
-		}
-		else
-		{
-			fprintf(stderr, "Command not found: %s\n", argv[0]);
-			exit(EXIT_FAILURE);
-		}
-	}
-	else
-	{
-		wait(NULL);
 	}
 }
 /**
