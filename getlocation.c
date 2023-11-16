@@ -107,28 +107,63 @@ char *search_in_path(const char *path_copy, const char *command)
 char *get_location(char *command)
 {
 	char *path = getenv("PATH");
-	char *path_copy = strdup_checked(path);
-	char *result = search_in_path(path_copy, command);
+	char *path_copy;
+	char *result;
 	struct stat buffer;
+	int status;
 
-	if (path)
+	if (!path)
 	{
-		if (!path_copy)
+		fprintf(stderr, "PATH environment variable is not set.\n");
+		return (NULL);
+	}
+	if (file_exists(command, &buffer))
+	{
+		return (strdup_checked(command));
+	}
+	path_copy = strdup_checked(path);
+	if (!path_copy)
+	{
+		return (NULL);
+	}
+	result = search_in_path(path_copy, command);
+
+	free(path_copy);
+
+	if (result)
+	{
+		pid_t pid = fork();
+
+		if (pid == -1)
 		{
+			perror("fork");
+			free(result);
 			return (NULL);
 		}
-		free(path_copy);
+		else if (pid == 0)
+		{
+			printf("Executing command: %s\n", result);
+			execlp(result, command, (char *)NULL);
 
-		if (result)
-		{
-			return (result);
+			perror("execlp");
+			exit(EXIT_FAILURE);
 		}
-		if (file_exists(command, &buffer))
+		else
 		{
-			return (strdup_checked(command));
+			waitpid(pid, &status, 0);
+
+			if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
+			{
+				return (result);
+			}
+			else
+			{
+				fprintf(stderr, "Command execution failed.\n");
+				free(result);
+
+				return (NULL);
+			}
 		}
 	}
-	free(result);
 	return (NULL);
 }
-
